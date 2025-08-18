@@ -1,73 +1,129 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const resultados = {
-  'Melhores do Ano': [
-    { name: 'Aksa Tamara', avatar: '/avatars/a.png', total: 93 },
-    { name: 'Samuel Pereira', avatar: '/avatars/b.png', total: 91 },
-    { name: 'Karina Andrade', avatar: '/avatars/b.png', total: 90 },
-    { name: 'Ana Pantera', avatar: '/avatars/b.png', total: 89 },
-    { name: 'Bianca Hayashi', avatar: '/avatars/b.png', total: 87 },
-    { name: 'Isac Miranda', avatar: '/avatars/b.png', total: 86 },
-    { name: 'Rafael Nascimento', avatar: '/avatars/b.png', total: 85 },
-    { name: 'Sara França', avatar: '/avatars/b.png', total: 83 },
-    { name: 'Ramiro Vilela', avatar: '/avatars/b.png', total: 82 },
-    { name: 'Stephanie Matos', avatar: '/avatars/b.png', total: 80 },
-  ],
-  'Revelação do Ano': [
-    { name: 'Aline Cardoso', avatar: '/avatars/a.png', total: 94 },
-    { name: 'Emilly Saglária', avatar: '/avatars/b.png', total: 92 },
-    { name: 'Isis da Paz', avatar: '/avatars/b.png', total: 89 },
-    { name: 'Nycholas Sousa', avatar: '/avatars/b.png', total: 87 },
-    { name: 'Pamela Vitorino', avatar: '/avatars/b.png', total: 86 },
-    { name: 'Mauricio Braga', avatar: '/avatars/b.png', total: 85 },
-    { name: 'Samira França', avatar: '/avatars/b.png', total: 84 },
-    { name: 'Marjorie Ozaki', avatar: '/avatars/b.png', total: 83 },
-    { name: 'Michele Ayancan', avatar: '/avatars/b.png', total: 81 },
-    { name: 'Ana Pantera', avatar: '/avatars/b.png', total: 79 },
-  ],
+// Mapeamento de candidatos (id → nome e avatar)
+const candidatosMap = {
+  '1': { name: 'Aksa Tamara', avatar: '/avatars/avatar_aksa.png' },
+  '2': { name: 'Aline Cardoso', avatar: '/avatars/avatar_aline.png' },
+  '3': { name: 'Ana Pantera', avatar: '/avatars/avatar_pantera.png' },
+  '4': { name: 'Bianca Hayashi', avatar: '/avatars/avatar_bianca.png' },
+  '5': { name: 'Emilly Saglária', avatar: '/avatars/avatar_emilly.png' },
+  '6': { name: 'Isac Miranda', avatar: '/avatars/avatar_isac.png' },
+  '7': { name: 'Isis da Paz', avatar: '/avatars/avatar_isis.png' },
+  '8': { name: 'Karina Andrade', avatar: '/avatars/avatar_karina.png' },
+  '9': { name: 'Marjorie Ozaki', avatar: '/avatars/avatar_marjorie.png' },
+  '10': { name: 'Mauricio Braga', avatar: '/avatars/avatar_mauricio.png' },
+  '11': { name: 'Michele Ayancan', avatar: '/avatars/avatar_michele.png' },
+  '12': { name: 'Nycholas Sousa', avatar: '/avatars/avatar_nycholas.png' },
+  '13': { name: 'Pamela Vitorino', avatar: '/avatars/avatar_pamela.png' },
+  '14': { name: 'Rafael Nascimento', avatar: '/avatars/b.png' },
+  '15': { name: 'Ramiro Vilela', avatar: '/avatars/avatar_ramiro.png' },
+  '16': { name: 'Samira França', avatar: '/avatars/avatar_samira.png' },
+  '17': { name: 'Samuel Pereira', avatar: '/avatars/avatar_samuel.png' },
+  '18': { name: 'Sara França', avatar: '/avatars/avatar_sara.png' },
+  '19': { name: 'Stephanie Matos', avatar: '/avatars/b.png' },
 };
 
 export default function Resultados() {
+  const [resultados, setResultados] = useState({});
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchResultados = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/votos");
+        const votos = await res.json();
+
+        const agrupados = {};
+        votos.forEach(voto => {
+          const { categoria, candidatoId, nota } = voto;
+          if (!agrupados[categoria]) agrupados[categoria] = {};
+          if (!agrupados[categoria][candidatoId])
+            agrupados[categoria][candidatoId] = { total: 0, count: 0 };
+          agrupados[categoria][candidatoId].total += nota;
+          agrupados[categoria][candidatoId].count += 1;
+        });
+
+        const resultadosFinal = {};
+        for (const categoria in agrupados) {
+          resultadosFinal[categoria] = Object.entries(agrupados[categoria])
+            .map(([candidatoId, data]) => ({
+              id: candidatoId,
+              nome: candidatosMap[candidatoId]?.name || 'Desconhecido',
+              avatar: candidatosMap[candidatoId]?.avatar || '/avatars/default.png',
+              media: data.total / data.count,
+              total: data.total,
+            }))
+            .sort((a, b) => b.media - a.media)
+            .slice(0, 10);
+        }
+
+        setResultados(resultadosFinal);
+        setLoading(false);
+      } catch (err) {
+        console.error("Erro ao buscar resultados:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchResultados();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Carregando resultados...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8">
-      <h1 className="text-4xl font-bold text-yellow-400 text-center mb-10">
+      <img
+        src="/logo/logotrofeu.png"
+        alt="Prêmio Melhores do Ano 2025"
+        className="mx-auto w-[60%] mb-6"
+      />
+      <h1 className="text-4xl font-bold text-[#C59E33] text-center mb-10">
         Resultado Final da Votação
       </h1>
 
       {Object.entries(resultados).map(([categoria, candidatos]) => (
         <section key={categoria} className="mb-12">
-          <h2 className="text-2xl font-bold text-yellow-300 mb-6 text-center">
+          <h2 className="text-2xl font-bold text-[#C59E33] mb-6 text-center">
             {categoria} - Top 10
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
             {candidatos.map((candidato, index) => (
               <div
-                key={candidato.name}
-                className="flex flex-col items-center bg-zinc-800 p-4 rounded-lg border border-zinc-700"
+                key={candidato.id}
+                className="flex flex-col items-center bg-zinc-800 p-4 rounded-lg border border-zinc-700 relative"
               >
                 <img
                   src={candidato.avatar}
-                  alt={candidato.name}
-                  className="w-24 h-24 rounded-full object-cover mb-2 border-2 border-yellow-400"
+                  alt={candidato.nome}
+                  className="w-24 h-24 rounded-full object-cover mb-2 border-2 border-[#C59E33]"
                 />
-                <span className="font-bold text-lg text-center">{candidato.name}</span>
-                <span className="text-yellow-400 text-sm mt-1">#{index + 1} Lugar</span>
-                <span className="text-zinc-300 text-sm">Pontos: {candidato.total}</span>
-                <button
-  onClick={() => {
-    localStorage.removeItem('auth');
-    window.location.href = '/';
-  }}
-  className="absolute top-4 right-4 text-sm bg-red-500 text-white px-3 py-1 rounded"
->
-  Sair
-</button>
-
+                <span className="font-bold text-lg text-center">{candidato.nome}</span>
+                <span className="text-[#C59E33] text-sm mt-1">#{index + 1} Lugar</span>
+                <span className="text-zinc-300 text-sm">Pontos Totais: {candidato.total}</span>
+                <span className="text-zinc-300 text-sm">Média: {candidato.media.toFixed(2)}</span>
               </div>
             ))}
           </div>
         </section>
       ))}
+
+      <button
+        onClick={() => {
+          localStorage.removeItem('auth');
+          navigate('/login');
+        }}
+        className="mt-8 px-6 py-2 bg-red-500 text-white rounded-lg font-semibold"
+      >
+        Sair
+      </button>
     </div>
   );
 }

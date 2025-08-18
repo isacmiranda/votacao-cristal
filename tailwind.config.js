@@ -5,4 +5,7 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  colors: {
+        ouro: '#C59E33',
+      },
 };
