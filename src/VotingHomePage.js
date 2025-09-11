@@ -15,7 +15,7 @@ export default function VotingHomePage() {
         { id: '2', name: 'Aline Cardoso (Aquáticas)', avatar: '/avatars/avatar_aline.png' },
         { id: '3', name: 'Ana Pantera (Terrestres)', avatar: '/avatars/avatar_pantera.png' },
         { id: '4', name: 'Bianca Hayashi (Aquáticas)', avatar: '/avatars/avatar_bianca.png' },
-        { id: '5', name: 'Eder Braga (Terrestres)', avatar: '/avatars/avatar_eder.png' },
+        { id: '5', name: 'Eder Abreu (Terrestres)', avatar: '/avatars/avatar_eder.png' },
         { id: '6', name: 'Emilly Saglária (Aquáticas)', avatar: '/avatars/avatar_emilly.png' },
         { id: '7', name: 'Isac Miranda (Operacional)', avatar: '/avatars/avatar_isac.png' },
         { id: '8', name: 'Isis da Paz  (Terrestres)', avatar: '/avatars/avatar_isis.png' },
@@ -37,7 +37,7 @@ export default function VotingHomePage() {
   const [nome, setNome] = useState('');
   const [scores, setScores] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const BACKEND_URL = 'http://localhost:4000'; // ajuste se necessário
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // ajuste se necessário
 
   const handleScoreChange = (category, candidateId, value) => {
     const numericValue = Math.max(0, Math.min(10, Number(value)));

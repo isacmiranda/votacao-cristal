@@ -7,7 +7,7 @@ const candidatosMap = {
   '2': { name: 'Aline Cardoso (Aquáticas)', avatar: '/avatars/avatar_aline.png' },
   '3': { name: 'Ana Pantera (Terrestres)', avatar: '/avatars/avatar_pantera.png' },
   '4': { name: 'Bianca Hayashi (Aquáticas)', avatar: '/avatars/avatar_bianca.png' },
-  '5': { name: 'Eder Braga (Terrestres)', avatar: '/avatars/avatar_eder.png' },
+  '5': { name: 'Eder Abreu (Terrestres)', avatar: '/avatars/avatar_eder.png' },
   '6': { name: 'Emilly Saglária (Aquáticas)', avatar: '/avatars/avatar_emilly.png' },
   '7': { name: 'Isac Miranda (Operacional)', avatar: '/avatars/avatar_isac.png' },
   '8': { name: 'Isis da Paz (Terrestres)', avatar: '/avatars/avatar_isis.png' },
@@ -32,8 +32,8 @@ export default function Resultados() {
   useEffect(() => {
     const fetchResultados = async () => {
       try {
-        const res = await fetch("http://localhost:4000/votos");
-        const votos = await res.json();
+       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+       const res = await fetch(`${BACKEND_URL}/votos`);
 
         const agrupados = {};
         votos.forEach(voto => {
