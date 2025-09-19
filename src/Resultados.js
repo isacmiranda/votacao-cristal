@@ -11,8 +11,8 @@ const candidatosMap = {
   '6': { name: 'Emilly Saglária (Aquáticas)', avatar: '/avatars/avatar_emilly.png' },
   '7': { name: 'Isac Miranda (Operacional)', avatar: '/avatars/avatar_isac.png' },
   '8': { name: 'Isis da Paz (Terrestres)', avatar: '/avatars/avatar_isis.png' },
-  '9': { name: 'Karina Andrade ((Aquáticas)', avatar: '/avatars/avatar_karina.png' },
-  '10': { name: 'Marjorie Ozaki (Terrestres)', avatar: '/avatars/avatar_marjorie.png' },  
+  '9': { name: 'Karina Andrade (Aquáticas)', avatar: '/avatars/avatar_karina.png' },
+  '10': { name: 'Marjorie Ozaki (Terrestres)', avatar: '/avatars/avatar_marjorie.png' },
   '11': { name: 'Michele Ayancan (Terrestres)', avatar: '/avatars/avatar_michele.png' },
   '12': { name: 'Nycholas Sousa (Terrestres)', avatar: '/avatars/avatar_nycholas.png' },
   '13': { name: 'Pamela Vitorino (Operacional)', avatar: '/avatars/avatar_pamela.png' },
@@ -21,27 +21,30 @@ const candidatosMap = {
   '16': { name: 'Samira França (Operacional)', avatar: '/avatars/avatar_samira.png' },
   '17': { name: 'Samuel Pereira (Terrestres)', avatar: '/avatars/avatar_samuel.png' },
   '18': { name: 'Sara França (Operacional)', avatar: '/avatars/avatar_sara.png' },
-  
 };
 
 export default function Resultados() {
   const [resultados, setResultados] = useState({});
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchResultados = async () => {
       try {
-       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-       const res = await fetch(`${BACKEND_URL}/votos`);
+        const BACKEND_URL =
+          process.env.REACT_APP_BACKEND_URL || "https://backend-votacao.onrender.com";
+        const res = await fetch(`${BACKEND_URL}/votos`);
+        if (!res.ok) throw new Error(`Erro na API: ${res.status}`);
+        const votos = await res.json(); // ✅ Agora votos existe
 
         const agrupados = {};
-        votos.forEach(voto => {
-          const { categoria, candidatoId, nota } = voto;
+        votos.forEach(({ categoria, candidatoId, nota }) => {
+          const notaNum = Number(nota) || 0;
           if (!agrupados[categoria]) agrupados[categoria] = {};
           if (!agrupados[categoria][candidatoId])
             agrupados[categoria][candidatoId] = { total: 0, count: 0 };
-          agrupados[categoria][candidatoId].total += nota;
+          agrupados[categoria][candidatoId].total += notaNum;
           agrupados[categoria][candidatoId].count += 1;
         });
 
@@ -50,9 +53,9 @@ export default function Resultados() {
           resultadosFinal[categoria] = Object.entries(agrupados[categoria])
             .map(([candidatoId, data]) => ({
               id: candidatoId,
-              nome: candidatosMap[candidatoId]?.name || 'Desconhecido',
-              avatar: candidatosMap[candidatoId]?.avatar || '/avatars/default.png',
-              media: data.total / data.count,
+              nome: candidatosMap[candidatoId]?.name || "Desconhecido",
+              avatar: candidatosMap[candidatoId]?.avatar || "/avatars/default.png",
+              media: data.count > 0 ? data.total / data.count : 0,
               total: data.total,
             }))
             .sort((a, b) => b.media - a.media)
@@ -60,9 +63,10 @@ export default function Resultados() {
         }
 
         setResultados(resultadosFinal);
-        setLoading(false);
       } catch (err) {
         console.error("Erro ao buscar resultados:", err);
+        setErro("Não foi possível carregar os resultados. Tente novamente mais tarde.");
+      } finally {
         setLoading(false);
       }
     };
@@ -74,6 +78,14 @@ export default function Resultados() {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         Carregando resultados...
+      </div>
+    );
+  }
+
+  if (erro) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {erro}
       </div>
     );
   }
@@ -108,7 +120,9 @@ export default function Resultados() {
                 <span className="font-bold text-lg text-center">{candidato.nome}</span>
                 <span className="text-[#C59E33] text-sm mt-1">#{index + 1} Lugar</span>
                 <span className="text-zinc-300 text-sm">Pontos Totais: {candidato.total}</span>
-                <span className="text-zinc-300 text-sm">Média: {candidato.media.toFixed(2)}</span>
+                <span className="text-zinc-300 text-sm">
+                  Média: {candidato.media.toFixed(2)}
+                </span>
               </div>
             ))}
           </div>
@@ -117,8 +131,8 @@ export default function Resultados() {
 
       <button
         onClick={() => {
-          localStorage.removeItem('auth');
-          navigate('/login');
+          localStorage.removeItem("auth");
+          navigate("/login");
         }}
         className="mt-8 px-6 py-2 bg-red-500 text-white rounded-lg font-semibold"
       >

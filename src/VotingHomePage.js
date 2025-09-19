@@ -81,11 +81,12 @@ export default function VotingHomePage() {
       });
 
       // Envia todos os votos em um único POST
-      const response = await fetch(`${BACKEND_URL}/votar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ votos }), // backend precisa aceitar { votos: [...] }
-      });
+     const response = await fetch("https://backend-votacao.onrender.com/votar", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ votos }), // backend precisa aceitar { votos: [...] }
+});
+
 
       const data = await response.json();
       if (data.success) {
