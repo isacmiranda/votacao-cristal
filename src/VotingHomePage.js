@@ -19,7 +19,7 @@ export default function VotingHomePage() {
         { id: '6', name: 'Emilly Saglária (Aquáticas)', avatar: '/avatars/avatar_emilly.png' },
         { id: '7', name: 'Isac Miranda (Operacional)', avatar: '/avatars/avatar_isac.png' },
         { id: '8', name: 'Isis da Paz  (Terrestres)', avatar: '/avatars/avatar_isis.png' },
-        { id: '9', name: 'Karina Andrade ((Aquáticas)', avatar: '/avatars/avatar_karina.png' },
+        { id: '9', name: 'Karina Andrade (Aquáticas)', avatar: '/avatars/avatar_karina.png' },
         { id: '10', name: 'Marjorie Ozaki (Terrestres)', avatar: '/avatars/avatar_marjorie.png' },
         { id: '11', name: 'Michele Ayancan (Terrestres)', avatar: '/avatars/avatar_michele.png' },
         { id: '12', name: 'Nycholas Sousa (Terrestres)', avatar: '/avatars/avatar_nycholas.png' },
@@ -81,10 +81,10 @@ export default function VotingHomePage() {
       });
 
       // Envia todos os votos em um único POST
-     const response = await fetch("https://backend-votacao.onrender.com/votar", {
+ const response = await fetch(`${BACKEND_URL}/votar`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ votos }), // backend precisa aceitar { votos: [...] }
+  body: JSON.stringify({ votos }),
 });
 
 
