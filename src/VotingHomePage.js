@@ -29,7 +29,6 @@ export default function VotingHomePage() {
         { id: '16', name: 'Samira França (Operacional)', avatar: '/avatars/avatar_samira.png' },
         { id: '17', name: 'Samuel Pereira (Terrestres)', avatar: '/avatars/avatar_samuel.png' },
         { id: '18', name: 'Sara França (Operacional)', avatar: '/avatars/avatar_sara.png' },
-        
       ],
     },
   ];
@@ -37,7 +36,7 @@ export default function VotingHomePage() {
   const [nome, setNome] = useState('');
   const [scores, setScores] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; // ajuste se necessário
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://backend-votacao.onrender.com";
 
   const handleScoreChange = (category, candidateId, value) => {
     const numericValue = Math.max(0, Math.min(10, Number(value)));
@@ -81,12 +80,11 @@ export default function VotingHomePage() {
       });
 
       // Envia todos os votos em um único POST
- const response = await fetch(`${BACKEND_URL}/votar`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ votos }),
-});
-
+      const response = await fetch(`${BACKEND_URL}/votar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ votos }),
+      });
 
       const data = await response.json();
       if (data.success) {
